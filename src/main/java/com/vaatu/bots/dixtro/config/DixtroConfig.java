@@ -54,6 +54,7 @@ public class DixtroConfig {
             ApplicationCommandRequest appCommand = ApplicationCommandRequest.builder()
                     .name(command.getName())
                     .description(command.getDescription())
+                    .addAllOptions(command.getOptions())
                     .build();
 
             commands.add(appCommand);

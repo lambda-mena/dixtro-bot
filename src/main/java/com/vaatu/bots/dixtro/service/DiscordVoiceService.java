@@ -9,27 +9,28 @@ import discord4j.core.object.VoiceState;
 import discord4j.core.object.command.Interaction;
 import discord4j.core.object.entity.Member;
 import discord4j.core.spec.AudioChannelJoinSpec;
-import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
+import lombok.Getter;
 import reactor.core.publisher.Mono;
 
+@Getter
 @Service
-public class VoiceService {
+public class DiscordVoiceService {
 
     private VoiceConnection voiceConnection;
-    private AudioProvider audioProvider;
+    private LavaPlayerService playerService;
 
-    public VoiceService(AudioProvider audioProvider) {
+    public DiscordVoiceService(LavaPlayerService playerService) {
         this.voiceConnection = null;
-        this.audioProvider = audioProvider;
+        this.playerService = playerService;
     }
 
     public Mono<Void> joinVoiceChannel(ChatInputInteractionEvent event) {
         Interaction interaction = event.getInteraction();
         Optional<Member> member = interaction.getMember();
 
-        if (member.isPresent() && voiceConnection == null) {
-            AudioChannelJoinSpec joinSpec = AudioChannelJoinSpec.builder().provider(audioProvider).build();
+        if (member.isPresent() && !this.playerService.isPlaying()) {
+            AudioChannelJoinSpec joinSpec = AudioChannelJoinSpec.builder().provider(playerService.getAudioProvider()).build();
 
             this.voiceConnection = Mono.just(member.get())
                     .flatMap(Member::getVoiceState)
@@ -37,6 +38,12 @@ public class VoiceService {
                     .flatMap(channel -> channel.join(joinSpec))
                     .block();
         }
+
+        return Mono.empty();
+    }
+
+    public Mono<Void> playSong(String url) {
+        this.playerService.playMusicURL(url);
 
         return Mono.empty();
     }

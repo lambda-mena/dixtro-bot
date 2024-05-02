@@ -1,11 +1,15 @@
 package com.vaatu.bots.dixtro.command;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.springframework.stereotype.Component;
 
-import com.vaatu.bots.dixtro.service.VoiceService;
+import com.vaatu.bots.dixtro.service.DiscordVoiceService;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.spec.InteractionReplyEditSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -13,7 +17,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class JoinCommand implements SlashCommand {
 
-    private VoiceService voiceService;
+    private DiscordVoiceService voiceService;
 
     @Override
     public String getName() {
@@ -23,6 +27,11 @@ public class JoinCommand implements SlashCommand {
     @Override
     public String getDescription() {
         return "Joins VC";
+    }
+
+    @Override
+    public Collection<ApplicationCommandOptionData> getOptions() {
+        return new ArrayList<ApplicationCommandOptionData>();
     }
 
     @Override
