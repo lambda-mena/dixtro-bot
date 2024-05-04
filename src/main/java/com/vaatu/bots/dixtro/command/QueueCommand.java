@@ -43,10 +43,11 @@ public class QueueCommand implements SlashCommand {
 
         try {
             List<EmbedCreateFields.Field> currentQueue = this.voiceService.getMusicQueue();
+
             EmbedCreateSpec.Builder embedBuilder = EmbedCreateSpec.builder()
             .title("Current Song: " + this.voiceService.getCurrentTrack());
 
-            for (EmbedCreateFields.Field field : currentQueue.subList(0, Math.min(currentQueue.size(), 5))) {
+            for (EmbedCreateFields.Field field : currentQueue) {
                 embedBuilder.addField(field);
             }
 

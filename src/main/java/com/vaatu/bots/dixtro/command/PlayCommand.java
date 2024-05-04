@@ -65,15 +65,13 @@ public class PlayCommand implements SlashCommand {
 
             this.voiceService.playSong(event, urlValue.get().asString());
 
-            String addedTrack = this.voiceService.getCurrentTrack();
-
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
-                    .withContentOrNull("✅ Playing: " + "```" + addedTrack + "```")).then();
+                    .withContentOrNull("✅ Playing")).then();
         } catch (Exception e) {
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
-                    .withContentOrNull("❌ Error at playing music: " + e.getMessage())).then();
+                    .withContentOrNull("❌ Error: " + e.getMessage())).then();
         }
         
     }

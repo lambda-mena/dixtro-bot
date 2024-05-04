@@ -24,7 +24,6 @@ public class TrackScheduler implements AudioLoadResultHandler {
         try {
             if (this.player.getPlayingTrack() == null) {
                 player.playTrack(track);
-
             } else {
                 this.trackEventListener.addTrackToQueue(track);
             }

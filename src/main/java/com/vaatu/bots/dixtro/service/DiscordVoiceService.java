@@ -92,13 +92,16 @@ public class DiscordVoiceService {
     public String getCurrentTrack() {
         try {
             return this.playerService.getCurrentTrack();
-        } catch (NullPointerException exception) {
+        } catch (Exception exception) {
             return "Nothing is playing right now.";
         }
     }
 
     public List<EmbedCreateFields.Field> getMusicQueue() {
-        return this.playerService.getTrackQueue();
+        List<EmbedCreateFields.Field> fieldList = this.playerService.getTrackQueue();
+        fieldList = fieldList.subList(0, Math.min(fieldList.size(), 5));
+
+        return fieldList;
     }
 
     public void leaveVoiceChannel() throws NullPointerException {
