@@ -40,12 +40,10 @@ public class DixtroConfig {
         GatewayDiscordClient client = DiscordClientBuilder.create(this.token)
                 .build()
                 .gateway()
-                .setInitialPresence(ignore -> ClientPresence.online(ClientActivity.listening("to /commands"))).login()
+                .setInitialPresence(ignore -> ClientPresence.doNotDisturb(ClientActivity.custom("Booting..."))).login()
                 .block();
 
         Long applicationId = client.getRestClient().getApplicationId().block();
-
-        client.getRestClient().getApplicationService().bulkOverwriteGlobalApplicationCommand(0, null);
 
         ArrayList<ApplicationCommandRequest> commands = new ArrayList<>();
 

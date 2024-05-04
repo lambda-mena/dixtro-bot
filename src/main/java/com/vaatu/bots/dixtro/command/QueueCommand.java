@@ -2,7 +2,10 @@ package com.vaatu.bots.dixtro.command;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import discord4j.core.spec.EmbedCreateFields;
+import discord4j.core.spec.EmbedCreateSpec;
 import org.springframework.stereotype.Component;
 
 import com.vaatu.bots.dixtro.service.DiscordVoiceService;
@@ -15,18 +18,18 @@ import reactor.core.publisher.Mono;
 
 @Component
 @AllArgsConstructor
-public class JoinCommand implements SlashCommand {
+public class QueueCommand implements SlashCommand {
 
     private DiscordVoiceService voiceService;
 
     @Override
     public String getName() {
-        return "join";
+        return "queue";
     }
 
     @Override
     public String getDescription() {
-        return "Join the voice channel";
+        return "Allows you to visualize the current music queue";
     }
 
     @Override
@@ -36,19 +39,27 @@ public class JoinCommand implements SlashCommand {
 
     @Override
     public Mono<Void> execute(ChatInputInteractionEvent event) {
+        event.reply("Loading song queue...").block();
+
         try {
-            event.reply("Joining...").block();
+            List<EmbedCreateFields.Field> currentQueue = this.voiceService.getMusicQueue();
+            EmbedCreateSpec.Builder embedBuilder = EmbedCreateSpec.builder()
+            .title("Current Song: " + this.voiceService.getCurrentTrack());
 
-            this.voiceService.joinVoiceChannel(event);
+            for (EmbedCreateFields.Field field : currentQueue.subList(0, Math.min(currentQueue.size(), 5))) {
+                embedBuilder.addField(field);
+            }
+
+            EmbedCreateSpec embed = embedBuilder.build();
 
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
-                    .withContentOrNull("✅ Connected")).then();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+                    .withContentOrNull(null)
+                    .withEmbeds(embed)).then();
+        } catch (NullPointerException exception) {
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
-                    .withContentOrNull("❌ Unable to connect")).then();
+                    .withContentOrNull("❌ Unable to load queue.")).then();
         }
 
     }

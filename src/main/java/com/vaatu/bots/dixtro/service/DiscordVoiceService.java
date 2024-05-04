@@ -1,7 +1,12 @@
 package com.vaatu.bots.dixtro.service;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import discord4j.common.util.Snowflake;
+import discord4j.core.spec.EmbedCreateFields;
 import org.springframework.stereotype.Service;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
@@ -18,42 +23,89 @@ import reactor.core.publisher.Mono;
 public class DiscordVoiceService {
 
     private VoiceConnection voiceConnection;
-    private LavaPlayerService playerService;
+    private final LavaPlayerService playerService;
 
     public DiscordVoiceService(LavaPlayerService playerService) {
         this.voiceConnection = null;
         this.playerService = playerService;
     }
 
-    public Mono<Void> joinVoiceChannel(ChatInputInteractionEvent event) {
+    private Member getInteractionMember(ChatInputInteractionEvent event) throws NoSuchElementException {
         Interaction interaction = event.getInteraction();
         Optional<Member> member = interaction.getMember();
 
-        if (member.isPresent() && !this.playerService.isPlaying()) {
-            AudioChannelJoinSpec joinSpec = AudioChannelJoinSpec.builder().provider(playerService.getAudioProvider()).build();
+        return member.orElseThrow();
+    }
 
-            this.voiceConnection = Mono.just(member.get())
+    private Boolean canJoinVC() {
+        return this.playerService.canPlayTrack();
+    }
+
+    private Boolean canPlayMusic(Member member) {
+        VoiceState memberVoiceState = member.getVoiceState().block();
+
+        if (this.voiceConnection == null || memberVoiceState == null) {
+            return false;
+        }
+
+        Snowflake botChannelId = this.voiceConnection.getChannelId().block();
+        Snowflake channelId = memberVoiceState.getChannelId().orElseThrow();
+
+        System.out.println(botChannelId + " | " + channelId);
+
+        return channelId.equals(botChannelId);
+    }
+
+    public Boolean joinVoiceChannel(ChatInputInteractionEvent event) {
+        Member interactionMember = getInteractionMember(event);
+
+        if (canJoinVC()) {
+            AudioChannelJoinSpec joinSpec = AudioChannelJoinSpec.builder().provider(playerService.getAudioProvider())
+                    .build();
+
+            this.voiceConnection = Mono.just(interactionMember)
                     .flatMap(Member::getVoiceState)
                     .flatMap(VoiceState::getChannel)
                     .flatMap(channel -> channel.join(joinSpec))
                     .block();
+
+            return true;
         }
 
-        return Mono.empty();
+        return false;
     }
 
-    public Mono<Void> playSong(String url) {
-        this.playerService.playMusicURL(url);
+    public void playSong(ChatInputInteractionEvent event, String url) throws Exception {
+        Member interactionMember = getInteractionMember(event);
 
-        return Mono.empty();
-    }
-
-    public Mono<Void> leaveVoiceChannel() {
-        if (this.voiceConnection != null) {
-            this.voiceConnection.disconnect().block();
+        if (!canPlayMusic(interactionMember)) {
+            if (joinVoiceChannel(event)) {
+                this.playerService.playMusicURL(url);
+            } else {
+                throw new Exception("The bot is already in use in another VC.");
+            }
+        } else {
+            this.playerService.playMusicURL(url);
         }
+    }
 
-        return Mono.empty();
+    public String getCurrentTrack() {
+        try {
+            return this.playerService.getCurrentTrack();
+        } catch (NullPointerException exception) {
+            return "Nothing is playing right now.";
+        }
+    }
+
+    public List<EmbedCreateFields.Field> getMusicQueue() {
+        return this.playerService.getTrackQueue();
+    }
+
+    public void leaveVoiceChannel() throws NullPointerException {
+        this.voiceConnection.disconnect().block();
+        this.playerService.clearMusicQueue();
+        this.playerService.stopMusic();
+        this.voiceConnection = null;
     }
 
 }

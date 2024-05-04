@@ -1,4 +1,4 @@
-package com.vaatu.bots.dixtro.player;
+package com.vaatu.bots.dixtro.provider;
 
 import java.nio.ByteBuffer;
 

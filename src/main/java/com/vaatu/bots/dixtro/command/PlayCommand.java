@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
+import discord4j.core.object.entity.Member;
+import discord4j.discordjson.json.ApplicationCommandInteractionData;
 import org.springframework.stereotype.Component;
 
 import com.vaatu.bots.dixtro.service.DiscordVoiceService;
@@ -29,12 +32,12 @@ public class PlayCommand implements SlashCommand {
 
     @Override
     public String getDescription() {
-        return "plays a single song.";
+        return "loads a single track or a playlist in your vc!";
     }
 
     @Override
     public Collection<ApplicationCommandOptionData> getOptions() {
-        ArrayList<ApplicationCommandOptionData> optionList = new ArrayList<ApplicationCommandOptionData>();
+        ArrayList<ApplicationCommandOptionData> optionList = new ArrayList<>();
 
         ApplicationCommandOptionData playURL = ApplicationCommandOptionData
                 .builder()
@@ -51,26 +54,26 @@ public class PlayCommand implements SlashCommand {
 
     @Override
     public Mono<Void> execute(ChatInputInteractionEvent event) {
+        event.reply("Loading...").block();
+
         try {
-            event.reply("Loading...").withEphemeral(true).block();
-
             Optional<ApplicationCommandInteractionOption> url = event.getOption("url");
+            ApplicationCommandInteractionOption urlOption = url.orElseThrow(() -> new Exception("You need to pass a URL."));
 
-            if (voiceService.getVoiceConnection() == null) {
-                voiceService.joinVoiceChannel(event);
-            }
+            Optional<ApplicationCommandInteractionOptionValue> urlValue = urlOption.getValue();
+            urlValue.orElseThrow(() -> new Exception("Invalid URL"));
 
-            url.ifPresent(option -> {
-                option.getValue().ifPresent(value -> {
-                    voiceService.playSong(value.asString());
-                });
-            });
+            this.voiceService.playSong(event, urlValue.get().asString());
+
+            String addedTrack = this.voiceService.getCurrentTrack();
 
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
-                    .withContentOrNull("✅ Connected & Playing")).then();
+                    .withContentOrNull("✅ Playing: " + "```" + addedTrack + "```")).then();
         } catch (Exception e) {
-            return event.reply("Error at trying to play music...").withEphemeral(true);
+            return event.editReply(InteractionReplyEditSpec.builder()
+                    .build()
+                    .withContentOrNull("❌ Error at playing music: " + e.getMessage())).then();
         }
         
     }

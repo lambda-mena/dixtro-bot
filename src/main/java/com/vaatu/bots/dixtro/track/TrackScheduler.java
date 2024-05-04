@@ -14,7 +14,7 @@ public class TrackScheduler implements AudioLoadResultHandler {
     private final AudioPlayer player;
     private final TrackEventListener trackEventListener;
 
-    public TrackScheduler(final AudioPlayer player, TrackEventListener trackEventListener) {
+    public TrackScheduler(AudioPlayer player, TrackEventListener trackEventListener) {
         this.player = player;
         this.trackEventListener = trackEventListener;
     }
@@ -24,17 +24,28 @@ public class TrackScheduler implements AudioLoadResultHandler {
         try {
             if (this.player.getPlayingTrack() == null) {
                 player.playTrack(track);
+
             } else {
                 this.trackEventListener.addTrackToQueue(track);
             }
         } catch (Exception e) {
-            System.err.println("Error TrackScheduler: " + e);
+            System.err.println("Error in single track load: " + e);
         }
     }
 
     @Override
     public void playlistLoaded(final AudioPlaylist playlist) {
-        // LavaPlayer found multiple AudioTracks from some playlist
+        try {
+            AudioTrack firstTrack = playlist.getSelectedTrack();
+            player.playTrack(firstTrack);
+            playlist.getTracks().remove(firstTrack);
+
+            for (AudioTrack track : playlist.getTracks()) {
+                trackEventListener.addTrackToQueue(track);
+            }
+        } catch (Exception exception) {
+            System.err.println("Error in playlist load: " + exception.getMessage());
+        }
     }
 
     @Override

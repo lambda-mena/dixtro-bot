@@ -22,12 +22,12 @@ public class PingCommand implements SlashCommand {
 
     @Override
     public String getDescription() {
-        return "ping pong!";
+        return "Ping Pong!";
     }
 
     @Override
     public Collection<ApplicationCommandOptionData> getOptions() {
-        return new ArrayList<ApplicationCommandOptionData>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -36,7 +36,7 @@ public class PingCommand implements SlashCommand {
 
         return event.editReply(InteractionReplyEditSpec.builder()
                 .build()
-                .withContentOrNull("Pong Pong!")).then();
+                .withContentOrNull("Pong Pong Pong!")).then();
     }
 
 }

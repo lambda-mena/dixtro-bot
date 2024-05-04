@@ -15,18 +15,12 @@ import reactor.core.publisher.Mono;
 @Component
 public class SlashCommandListener {
 
-    private final GatewayDiscordClient client;
     private final Collection<SlashCommand> commands;
 
     public SlashCommandListener(List<SlashCommand> slashCommands, GatewayDiscordClient client) {
         this.commands = slashCommands;
-        this.client = client;
 
-        this.client.on(ChatInputInteractionEvent.class, this::handle).subscribe();
-    }
-
-    public Class<ChatInputInteractionEvent> getEventType() {
-        return ChatInputInteractionEvent.class;
+        client.on(ChatInputInteractionEvent.class, this::handle).subscribe();
     }
 
     public Mono<Void> handle(ChatInputInteractionEvent event) {

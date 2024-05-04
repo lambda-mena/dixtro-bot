@@ -30,7 +30,7 @@ public class DisconnectCommand implements SlashCommand {
 
     @Override
     public Collection<ApplicationCommandOptionData> getOptions() {
-        return new ArrayList<ApplicationCommandOptionData>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -38,7 +38,7 @@ public class DisconnectCommand implements SlashCommand {
         try {
             this.voiceService.leaveVoiceChannel();
 
-            return event.reply("✅ Disconnected").withEphemeral(true);
+            return event.reply("✅ Disconnected");
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return event.reply("❌ Error").withEphemeral(true);
