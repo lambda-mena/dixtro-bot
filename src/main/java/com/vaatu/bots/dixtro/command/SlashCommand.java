@@ -8,12 +8,12 @@ import reactor.core.publisher.Mono;
 
 public interface SlashCommand {
 
-    public String getName();
+    String getName();
 
-    public String getDescription();
+    String getDescription();
 
-    public Collection<ApplicationCommandOptionData> getOptions();
+    Collection<ApplicationCommandOptionData> getOptions();
 
-    public Mono<Void> execute(ChatInputInteractionEvent event);
+    Mono<Void> execute(ChatInputInteractionEvent event);
 
 }

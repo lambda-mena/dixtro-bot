@@ -3,6 +3,7 @@ package com.vaatu.bots.dixtro.service;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import discord4j.core.object.presence.ClientPresence;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class ScheduledEventsService {
 
@@ -29,7 +31,7 @@ public class ScheduledEventsService {
             client.updatePresence(ClientPresence.idle(ClientActivity.custom(this.clientStates.get(randomNumber))))
                     .block();
         } catch (IndexOutOfBoundsException exception) {
-            System.out.println("Unable to get a number");
+            log.error("Unable to get a number");
         }
     }
 

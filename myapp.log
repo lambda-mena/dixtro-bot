@@ -1,0 +1,34 @@
+2024-05-04T18:33:16.922-05:00  INFO 2588 --- [dixtro] [main] c.vaatu.bots.dixtro.DixtroApplication    : Starting DixtroApplication using Java 21.0.2 with PID 2588 (D:\Home\Escritorio\Codigo\Java\dixtro\target\classes started by juan_ in D:\Home\Escritorio\Codigo\Java\dixtro)
+2024-05-04T18:33:16.925-05:00  INFO 2588 --- [dixtro] [main] c.vaatu.bots.dixtro.DixtroApplication    : No active profile set, falling back to 1 default profile: "default"
+2024-05-04T18:33:19.244-05:00  INFO 2588 --- [dixtro] [main] discord4j.core.DiscordClientBuilder      : Discord4J 3.3.0-RC1 (https://discord4j.com)
+2024-05-04T18:33:21.631-05:00  INFO 2588 --- [dixtro] [reactor-http-nio-3] discord4j.gateway.DefaultGatewayClient   : [G:64ac2c3e, S:0] Connected to Gateway
+2024-05-04T18:33:21.632-05:00  INFO 2588 --- [dixtro] [reactor-http-nio-3] d.core.shard.LocalShardCoordinator       : [G:64ac2c3e, S:0] Shard connected
+2024-05-04T18:33:22.208-05:00  INFO 2588 --- [dixtro] [boundedElastic-1] c.vaatu.bots.dixtro.config.DixtroConfig  : disconnect
+2024-05-04T18:33:22.208-05:00  INFO 2588 --- [dixtro] [boundedElastic-1] c.vaatu.bots.dixtro.config.DixtroConfig  : join
+2024-05-04T18:33:22.208-05:00  INFO 2588 --- [dixtro] [boundedElastic-1] c.vaatu.bots.dixtro.config.DixtroConfig  : ping
+2024-05-04T18:33:22.208-05:00  INFO 2588 --- [dixtro] [boundedElastic-1] c.vaatu.bots.dixtro.config.DixtroConfig  : play
+2024-05-04T18:33:22.209-05:00  INFO 2588 --- [dixtro] [boundedElastic-1] c.vaatu.bots.dixtro.config.DixtroConfig  : queue
+2024-05-04T18:33:22.307-05:00  INFO 2588 --- [dixtro] [main] c.vaatu.bots.dixtro.DixtroApplication    : Started DixtroApplication in 5.957 seconds (process running for 6.555)
+2024-05-04T18:41:45.672-05:00  INFO 2588 --- [dixtro] [reactor-http-nio-3] d.core.shard.LocalShardCoordinator       : [G:64ac2c3e, S:0] Shard disconnected
+2024-05-04T18:41:45.673-05:00  INFO 2588 --- [dixtro] [reactor-http-nio-3] discord4j.core.shard.GatewayBootstrap    : [G:64ac2c3e, S:0] All shards disconnected
+2024-05-04T18:48:52.883-05:00  INFO 15460 --- [dixtro] [main] c.vaatu.bots.dixtro.DixtroApplication    : Starting DixtroApplication using Java 21.0.2 with PID 15460 (D:\Home\Escritorio\Codigo\Java\dixtro\target\classes started by juan_ in D:\Home\Escritorio\Codigo\Java\dixtro)
+2024-05-04T18:48:52.886-05:00  INFO 15460 --- [dixtro] [main] c.vaatu.bots.dixtro.DixtroApplication    : No active profile set, falling back to 1 default profile: "default"
+2024-05-04T18:48:56.931-05:00  INFO 15460 --- [dixtro] [main] discord4j.core.DiscordClientBuilder      : Discord4J 3.3.0-RC1 (https://discord4j.com)
+2024-05-04T18:49:00.166-05:00  INFO 15460 --- [dixtro] [reactor-http-nio-3] discord4j.gateway.DefaultGatewayClient   : [G:1e7de720, S:0] Connected to Gateway
+2024-05-04T18:49:00.169-05:00  INFO 15460 --- [dixtro] [reactor-http-nio-3] d.core.shard.LocalShardCoordinator       : [G:1e7de720, S:0] Shard connected
+2024-05-04T18:49:00.815-05:00  INFO 15460 --- [dixtro] [boundedElastic-1] c.vaatu.bots.dixtro.config.DixtroConfig  : disconnect
+2024-05-04T18:49:00.815-05:00  INFO 15460 --- [dixtro] [boundedElastic-1] c.vaatu.bots.dixtro.config.DixtroConfig  : join
+2024-05-04T18:49:00.815-05:00  INFO 15460 --- [dixtro] [boundedElastic-1] c.vaatu.bots.dixtro.config.DixtroConfig  : ping
+2024-05-04T18:49:00.815-05:00  INFO 15460 --- [dixtro] [boundedElastic-1] c.vaatu.bots.dixtro.config.DixtroConfig  : play
+2024-05-04T18:49:00.816-05:00  INFO 15460 --- [dixtro] [boundedElastic-1] c.vaatu.bots.dixtro.config.DixtroConfig  : queue
+2024-05-04T18:49:01.009-05:00  INFO 15460 --- [dixtro] [main] c.vaatu.bots.dixtro.DixtroApplication    : Started DixtroApplication in 8.879 seconds (process running for 9.537)
+2024-05-04T18:49:45.902-05:00  INFO 15460 --- [dixtro] [reactor-http-nio-1] d.voice.DefaultVoiceGatewayClient        : [G:1e7de720, S:0, guildId:1052841358873858139] Identifying
+2024-05-04T18:49:46.088-05:00  INFO 15460 --- [dixtro] [reactor-http-nio-1] d.voice.DefaultVoiceGatewayClient        : [G:1e7de720, S:0, guildId:1052841358873858139] Waiting for session description
+2024-05-04T18:49:46.478-05:00  INFO 15460 --- [dixtro] [reactor-http-nio-1] d.voice.DefaultVoiceGatewayClient        : [G:1e7de720, S:0, guildId:1052841358873858139] Receiving events
+2024-05-04T18:49:46.493-05:00  WARN 15460 --- [dixtro] [lava-daemon-pool-info-loader-2-thread-1] c.s.d.l.s.y.YoutubeAccessTokenTracker    : YouTube auth tokens can't be retrieved because email and password is unset in YoutubeAudioSourceManager, age restricted videos may throw exceptions.
+2024-05-04T18:49:46.970-05:00  INFO 15460 --- [dixtro] [lava-daemon-pool-info-loader-2-thread-1] c.s.d.l.s.y.YoutubeAccessTokenTracker    : Updating YouTube visitor id (current is null).
+2024-05-04T18:49:47.221-05:00  INFO 15460 --- [dixtro] [lava-daemon-pool-info-loader-2-thread-1] c.s.d.l.s.y.YoutubeAccessTokenTracker    : Updating YouTube visitor id succeeded, new one is CgtLZG05Wmo1VExIZyick9uxBjIKCgJDTxIEGgAgaDoMCAEg7Z-o2cKzsptm, next update will be after 600 seconds.
+2024-05-04T18:49:47.352-05:00  WARN 15460 --- [dixtro] [lava-daemon-pool-info-loader-2-thread-1] d.l.s.y.DefaultYoutubeTrackDetailsLoader : Received different YouTube video (aQvGIIdgFDM, want: xq4P4R36-hk) to what was requested, retrying with WEB client...
+2024-05-04T18:49:47.632-05:00  WARN 15460 --- [dixtro] [lava-daemon-pool-playback-1-thread-1] d.l.s.y.DefaultYoutubeTrackDetailsLoader : Received different YouTube video (aQvGIIdgFDM, want: xq4P4R36-hk) to what was requested, retrying with WEB client...
+2024-05-04T18:51:58.163-05:00  INFO 15460 --- [dixtro] [reactor-http-nio-3] d.core.shard.LocalShardCoordinator       : [G:1e7de720, S:0] Shard disconnected
+2024-05-04T18:51:58.165-05:00  INFO 15460 --- [dixtro] [reactor-http-nio-3] discord4j.core.shard.GatewayBootstrap    : [G:1e7de720, S:0] All shards disconnected

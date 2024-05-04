@@ -3,6 +3,7 @@ package com.vaatu.bots.dixtro.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,20 +12,20 @@ import com.vaatu.bots.dixtro.command.SlashCommand;
 
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.Event;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.rest.RestClient;
 import jakarta.annotation.PreDestroy;
 
+@Slf4j
 @Configuration
 public class DixtroConfig {
 
     @Value("${token}")
     private String token;
 
-    private GatewayDiscordClient client = null;
+    private GatewayDiscordClient client;
 
     @Value("${devServer}")
     private Long devServer;
@@ -35,44 +36,56 @@ public class DixtroConfig {
         this.client.logout().block();
     }
 
+    private void registerGuildCommands(GatewayDiscordClient client, Long applicationId, List<ApplicationCommandRequest> commands) {
+        try {
+            client.getRestClient().getApplicationService()
+                    .bulkOverwriteGuildApplicationCommand(applicationId, devServer, commands)
+                    .doOnNext(ignore -> log.info(ignore.name(), " loaded."))
+                    .doOnError(e -> log.error(e.getMessage()))
+                    .subscribe();
+        } catch (NullPointerException exception) {
+            log.error("Dixtro was not able to load guild commands.");
+        }
+    }
+
+    private void registerGlobalCommands(GatewayDiscordClient client, Long applicationId) {
+        try {
+            ArrayList<ApplicationCommandRequest> globalCommands = new ArrayList<>();
+
+            client.getRestClient().getApplicationService()
+                    .bulkOverwriteGlobalApplicationCommand(applicationId, globalCommands)
+                    .doOnNext(ignore -> log.info(ignore.name(), " globally loaded."))
+                    .doOnError(e -> log.error(e.getMessage(), " globally"))
+                    .subscribe();
+        } catch (NullPointerException exception) {
+            log.error("Dixtro was not able to update global commands.");
+        }
+    }
+
     @Bean
-    public <T extends Event> GatewayDiscordClient gatewayDiscordClient(final List<SlashCommand> localCommands) {
+    public GatewayDiscordClient gatewayDiscordClient(final List<SlashCommand> localCommands) {
         GatewayDiscordClient client = DiscordClientBuilder.create(this.token)
                 .build()
                 .gateway()
                 .setInitialPresence(ignore -> ClientPresence.doNotDisturb(ClientActivity.custom("Booting..."))).login()
                 .block();
 
+        assert client != null;
         Long applicationId = client.getRestClient().getApplicationId().block();
 
         ArrayList<ApplicationCommandRequest> commands = new ArrayList<>();
 
-        // Translate from SlashCommand interface to AppCommandRequest.
         for (SlashCommand command : localCommands) {
             ApplicationCommandRequest appCommand = ApplicationCommandRequest.builder()
                     .name(command.getName())
                     .description(command.getDescription())
                     .addAllOptions(command.getOptions())
                     .build();
-
             commands.add(appCommand);
         }
 
-        // Add Dev guild commands to the bot.
-        client.getRestClient().getApplicationService()
-                .bulkOverwriteGuildApplicationCommand(applicationId, devServer, commands)
-                .doOnNext(ignore -> System.out.println(String.format("%s loaded.", ignore.name())))
-                .doOnError(e -> System.out.println(e.getMessage()))
-                .subscribe();
-
-        ArrayList<ApplicationCommandRequest> globalCommands = new ArrayList<>();
-
-        // Add Global commands to the bot.
-        client.getRestClient().getApplicationService()
-                .bulkOverwriteGlobalApplicationCommand(applicationId, globalCommands)
-                .doOnNext(ignore -> System.out.println("Global commands loaded."))
-                .doOnError(e -> System.out.println(e.getMessage()))
-                .subscribe();
+        registerGuildCommands(client, applicationId, commands);
+        registerGlobalCommands(client, applicationId);
 
         this.client = client;
 

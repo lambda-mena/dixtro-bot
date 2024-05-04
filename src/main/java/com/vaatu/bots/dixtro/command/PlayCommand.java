@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.Optional;
 
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
-import discord4j.core.object.entity.Member;
-import discord4j.discordjson.json.ApplicationCommandInteractionData;
 import org.springframework.stereotype.Component;
 
 import com.vaatu.bots.dixtro.service.DiscordVoiceService;
