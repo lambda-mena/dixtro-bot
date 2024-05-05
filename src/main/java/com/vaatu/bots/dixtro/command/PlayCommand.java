@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.Optional;
 
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.vaatu.bots.dixtro.service.DiscordVoiceService;
@@ -17,10 +20,12 @@ import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@Component
+@Slf4j
 @AllArgsConstructor
+@Component
 public class PlayCommand implements SlashCommand {
 
+    private static final Logger log = LoggerFactory.getLogger(PlayCommand.class);
     private DiscordVoiceService voiceService;
 
     @Override
@@ -66,10 +71,11 @@ public class PlayCommand implements SlashCommand {
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
                     .withContentOrNull("✅ Playing")).then();
-        } catch (Exception e) {
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
-                    .withContentOrNull("❌ Error: " + e.getMessage())).then();
+                    .withContentOrNull("❌ Internal Error")).then();
         }
         
     }

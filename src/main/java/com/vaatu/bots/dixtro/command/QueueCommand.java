@@ -6,6 +6,7 @@ import java.util.List;
 
 import discord4j.core.spec.EmbedCreateFields;
 import discord4j.core.spec.EmbedCreateSpec;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import com.vaatu.bots.dixtro.service.DiscordVoiceService;
@@ -16,8 +17,9 @@ import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@Component
+@Slf4j
 @AllArgsConstructor
+@Component
 public class QueueCommand implements SlashCommand {
 
     private DiscordVoiceService voiceService;
@@ -58,6 +60,7 @@ public class QueueCommand implements SlashCommand {
                     .withContentOrNull(null)
                     .withEmbeds(embed)).then();
         } catch (NullPointerException exception) {
+            log.error(exception.getMessage());
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
                     .withContentOrNull("❌ Unable to load queue.")).then();

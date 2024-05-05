@@ -11,8 +11,8 @@ import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@Component
 @AllArgsConstructor
+@Component
 public class PingCommand implements SlashCommand {
 
     @Override

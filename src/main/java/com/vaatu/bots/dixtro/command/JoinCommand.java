@@ -3,6 +3,7 @@ package com.vaatu.bots.dixtro.command;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import com.vaatu.bots.dixtro.service.DiscordVoiceService;
@@ -13,8 +14,9 @@ import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@Component
+@Slf4j
 @AllArgsConstructor
+@Component
 public class JoinCommand implements SlashCommand {
 
     private DiscordVoiceService voiceService;
@@ -44,8 +46,8 @@ public class JoinCommand implements SlashCommand {
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
                     .withContentOrNull("✅ Connected")).then();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
                     .withContentOrNull("❌ Unable to connect")).then();

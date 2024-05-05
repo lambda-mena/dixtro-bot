@@ -39,9 +39,8 @@ public class DisconnectCommand implements SlashCommand {
             this.voiceService.leaveVoiceChannel();
 
             return event.reply("✅ Disconnected");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return event.reply("❌ Error").withEphemeral(true);
+        } catch (NullPointerException e) {
+            return event.reply("❌ Can't leave a VC that i'm not in.").withEphemeral(true);
         }
 
     }
