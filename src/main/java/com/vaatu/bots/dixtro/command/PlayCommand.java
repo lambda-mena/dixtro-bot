@@ -25,7 +25,6 @@ import reactor.core.publisher.Mono;
 @Component
 public class PlayCommand implements SlashCommand {
 
-    private static final Logger log = LoggerFactory.getLogger(PlayCommand.class);
     private DiscordVoiceService voiceService;
 
     @Override
