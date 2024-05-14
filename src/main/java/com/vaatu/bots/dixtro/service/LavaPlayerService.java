@@ -78,7 +78,8 @@ public class LavaPlayerService {
 
         for (AudioTrack track : trackQueue) {
             String trackTitle = track.getInfo().title;
-            trackCollection.add(EmbedCreateFields.Field.of(String.valueOf(queuePosition), "```" + trackTitle + "```", false));
+            String trackPosition = String.valueOf(queuePosition);
+            trackCollection.add(EmbedCreateFields.Field.of(trackPosition + " Song", " ``" + trackTitle + "``", false));
             queuePosition++;
         }
 

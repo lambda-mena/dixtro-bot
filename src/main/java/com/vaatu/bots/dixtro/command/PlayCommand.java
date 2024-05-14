@@ -1,12 +1,12 @@
 package com.vaatu.bots.dixtro.command;
 
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+import com.google.api.services.youtube.model.SearchResult;
 import com.vaatu.bots.dixtro.service.YoutubeService;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +32,9 @@ public class PlayCommand implements SlashCommand {
 
     private boolean validateURL(String source) {
         try {
-            new URL(source).toURI();
+            new URI(source);
             return true;
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             return false;
         }
     }
@@ -66,31 +66,39 @@ public class PlayCommand implements SlashCommand {
         return optionList;
     }
 
+    private String getSourceValue(ChatInputInteractionEvent event) throws Exception {
+        Optional<ApplicationCommandInteractionOption> source = event.getOption("source");
+        ApplicationCommandInteractionOption urlOption = source.orElseThrow(() -> new Exception("You need to pass a source or url."));
+
+        Optional<ApplicationCommandInteractionOptionValue> urlValue = urlOption.getValue();
+        urlValue.orElseThrow(() -> new Exception("Invalid Source"));
+
+        return urlValue.get().asString();
+    }
+
     @Override
     public Mono<Void> execute(ChatInputInteractionEvent event) {
         event.reply("Loading...").block();
 
         try {
-            Optional<ApplicationCommandInteractionOption> source = event.getOption("source");
-            ApplicationCommandInteractionOption urlOption = source.orElseThrow(() -> new Exception("You need to pass a source or url."));
-
-            Optional<ApplicationCommandInteractionOptionValue> urlValue = urlOption.getValue();
-            urlValue.orElseThrow(() -> new Exception("Invalid Source"));
-
-            String videoSource = urlValue.get().asString();
+            String videoTitle;
+            String videoSource = getSourceValue(event);
 
             if (!validateURL(videoSource)) {
-                String videoId = youtubeService.getVideoUrl(videoSource);
-                videoSource = "https://www.youtube.com/watch?v=" + videoId;
+                SearchResult videoResult = youtubeService.getVideoUrl(videoSource);
+                videoTitle = videoResult.getSnippet().getTitle();
+                videoSource = "https://www.youtube.com/watch?v=" + videoResult.getId().getVideoId();
+            } else {
+                videoTitle = youtubeService.getVideoTitle(videoSource);
             }
 
             this.voiceService.playSong(event, videoSource);
 
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
-                    .withContentOrNull("✅ Playing")).then();
+                    .withContentOrNull("✅ Playing: `` " + videoTitle + " ``")).then();
         } catch (Exception exception) {
-            log.error(exception.getMessage());
+            log.error(exception.toString());
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
                     .withContentOrNull("❌ Internal Error")).then();
