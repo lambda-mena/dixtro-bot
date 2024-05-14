@@ -1,9 +1,13 @@
 package com.vaatu.bots.dixtro.command;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+import com.vaatu.bots.dixtro.service.YoutubeService;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,6 +28,16 @@ import reactor.core.publisher.Mono;
 public class PlayCommand implements SlashCommand {
 
     private DiscordVoiceService voiceService;
+    private YoutubeService youtubeService;
+
+    private boolean validateURL(String source) {
+        try {
+            new URL(source).toURI();
+            return true;
+        } catch (MalformedURLException | URISyntaxException e) {
+            return false;
+        }
+    }
 
     @Override
     public String getName() {
@@ -39,15 +53,15 @@ public class PlayCommand implements SlashCommand {
     public Collection<ApplicationCommandOptionData> getOptions() {
         ArrayList<ApplicationCommandOptionData> optionList = new ArrayList<>();
 
-        ApplicationCommandOptionData playURL = ApplicationCommandOptionData
+        ApplicationCommandOptionData sourceOption = ApplicationCommandOptionData
                 .builder()
-                .name("url")
-                .description("url of the song.")
+                .name("source")
+                .description("url/source of the song.")
                 .type(ApplicationCommandOption.Type.STRING.getValue())
                 .required(true)
                 .build();
 
-        optionList.add(playURL);
+        optionList.add(sourceOption);
 
         return optionList;
     }
@@ -57,13 +71,20 @@ public class PlayCommand implements SlashCommand {
         event.reply("Loading...").block();
 
         try {
-            Optional<ApplicationCommandInteractionOption> url = event.getOption("url");
-            ApplicationCommandInteractionOption urlOption = url.orElseThrow(() -> new Exception("You need to pass a URL."));
+            Optional<ApplicationCommandInteractionOption> source = event.getOption("source");
+            ApplicationCommandInteractionOption urlOption = source.orElseThrow(() -> new Exception("You need to pass a source or url."));
 
             Optional<ApplicationCommandInteractionOptionValue> urlValue = urlOption.getValue();
-            urlValue.orElseThrow(() -> new Exception("Invalid URL"));
+            urlValue.orElseThrow(() -> new Exception("Invalid Source"));
 
-            this.voiceService.playSong(event, urlValue.get().asString());
+            String videoSource = urlValue.get().asString();
+
+            if (!validateURL(videoSource)) {
+                String videoId = youtubeService.getVideoUrl(videoSource);
+                videoSource = "https://www.youtube.com/watch?v=" + videoId;
+            }
+
+            this.voiceService.playSong(event, videoSource);
 
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()

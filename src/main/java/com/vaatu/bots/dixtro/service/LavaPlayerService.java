@@ -53,6 +53,10 @@ public class LavaPlayerService {
         this.playerManager.loadItem(s, this.trackScheduler);
     }
 
+    public void skipMusic() {
+        this.audioPlayer.stopCurrentTrack();
+    }
+
     public void stopMusic() {
         this.audioPlayer.stopTrack();
     }

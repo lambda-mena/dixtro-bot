@@ -88,6 +88,14 @@ public class DiscordVoiceService {
         }
     }
 
+    public void clearMusicQueue() {
+        this.playerService.clearMusicQueue();
+    }
+
+    public void skipCurrentTrack() {
+        this.playerService.skipMusic();
+    }
+
     public String getCurrentTrack() {
         try {
             return this.playerService.getCurrentTrack();

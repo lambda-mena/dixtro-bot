@@ -1,56 +1,54 @@
 package com.vaatu.bots.dixtro.command;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import com.vaatu.bots.dixtro.service.DiscordVoiceService;
-
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.spec.InteractionReplyEditSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @AllArgsConstructor
 @Component
-public class JoinCommand implements SlashCommand {
+public class ClearCommand implements SlashCommand {
 
     private DiscordVoiceService voiceService;
 
     @Override
     public String getName() {
-        return "join";
+        return "clear";
     }
 
     @Override
     public String getDescription() {
-        return "Join the voice channel";
+        return "Clears the current music queue";
     }
 
     @Override
     public Collection<ApplicationCommandOptionData> getOptions() {
-        return new ArrayList<>();
+        return List.of();
     }
 
     @Override
     public Mono<Void> execute(ChatInputInteractionEvent event) {
         try {
-            event.reply("Joining...").block();
+            event.reply("Clearing queue...").block();
 
-            this.voiceService.joinVoiceChannel(event);
+            this.voiceService.clearMusicQueue();
 
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
-                    .withContentOrNull("✅ Connected")).then();
+                    .withContentOrNull("✅ Cleared")).then();
         } catch (Exception exception) {
             log.error(exception.getMessage());
             return event.editReply(InteractionReplyEditSpec.builder()
                     .build()
-                    .withContentOrNull("❌ Unable to connect")).then();
+                    .withContentOrNull("❌ Unable to clear queue")).then();
         }
     }
 }
