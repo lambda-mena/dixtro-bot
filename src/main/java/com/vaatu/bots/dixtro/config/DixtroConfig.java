@@ -22,12 +22,12 @@ import jakarta.annotation.PreDestroy;
 @Configuration
 public class DixtroConfig {
 
-    @Value("${secrets.TOKEN}")
+    @Value("${TOKEN}")
     private String token;
 
     private GatewayDiscordClient client;
 
-    @Value("${secrets.DEV_SERVER}")
+    @Value("${DEV_SERVER}")
     private Long devServer;
 
     @PreDestroy
