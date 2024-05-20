@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class YoutubeService {
 
-    @Value("${apiKey}")
+    @Value("${secrets.APIKEY}")
     private String apiKey;
     final YouTube youtube;
 
