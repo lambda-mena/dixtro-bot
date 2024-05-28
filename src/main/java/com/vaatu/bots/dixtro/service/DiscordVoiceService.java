@@ -50,8 +50,6 @@ public class DiscordVoiceService {
         Snowflake botChannelId = this.voiceConnection.getChannelId().block();
         Snowflake channelId = memberVoiceState.getChannelId().orElseThrow();
 
-        System.out.println(botChannelId + " | " + channelId);
-
         return channelId.equals(botChannelId);
     }
 

@@ -23,6 +23,7 @@ public class TrackScheduler implements AudioLoadResultHandler {
     public void trackLoaded(final AudioTrack track) {
         try {
             if (this.player.getPlayingTrack() == null) {
+                System.out.print(track.getInfo().title);
                 player.playTrack(track);
             } else {
                 this.trackEventListener.addTrackToQueue(track);
@@ -49,7 +50,7 @@ public class TrackScheduler implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        // LavaPlayer did not find any audio to extract
+        System.out.println("Unable to find audio to extract");
     }
 
     @Override

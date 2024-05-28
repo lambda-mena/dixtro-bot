@@ -34,6 +34,7 @@ build/
 
 ### Log Files ###
 dixtro.log
+*.gz
 
 ### Secrets ###
 secrets.properties

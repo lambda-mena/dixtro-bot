@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 @Service
 public class YoutubeService {
 
@@ -32,10 +33,6 @@ public class YoutubeService {
             videoChars = uri.getQuery().split("[=&]+");
         } else {
             videoChars = uri.getPath().split("/");
-        }
-
-        for (String videoChar: videoChars) {
-            System.out.println(videoChar);
         }
 
         return videoChars[1];

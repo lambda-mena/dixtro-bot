@@ -24,6 +24,10 @@ public class TrackEventListener extends AudioEventAdapter {
         this.blockingQueue.clear();
     }
 
+    public void onTrackStart(AudioPlayer player, AudioTrack track) {
+        System.out.println("Unable to play... " + track.getInfo().title);
+    }
+
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         try {
             if (!this.blockingQueue.isEmpty()) {
