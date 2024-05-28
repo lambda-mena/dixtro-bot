@@ -1,4 +1,4 @@
-package com.vaatu.bots.dixtro.dixtro;
+package com.vaatu.bots.dixtro;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
