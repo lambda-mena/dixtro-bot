@@ -20,12 +20,14 @@ configurations {
 repositories {
 	mavenCentral()
 	maven("https://jitpack.io")
+	maven("https://maven.lavalink.dev/releases")
 }
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("net.dv8tion:JDA:5.0.0-beta.24")
 	implementation("dev.arbjerg:lavaplayer:2.1.2")
+	implementation("dev.lavalink.youtube:v2:1.3.0")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.projectlombok:lombok")

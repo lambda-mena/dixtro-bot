@@ -1,22 +1,22 @@
 package com.vaatu.bots.dixtro.service;
 
-import com.vaatu.bots.dixtro.audio.AudioManager;
-import com.vaatu.bots.dixtro.audio.AudioPlayerSendHandler;
+import com.vaatu.bots.dixtro.audio.BotAudioManager;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 public class ManagerService {
-    private final HashMap<String, AudioManager> guildSendHandlers = new HashMap<>();
+    private final HashMap<String, BotAudioManager> guildSendHandlers = new HashMap<>();
 
-    public AudioManager getAudioManager(String guildId) {
-        return this.guildSendHandlers.get(guildId);
+    public Optional<BotAudioManager> getAudioManager(String guildId) {
+        return Optional.ofNullable(this.guildSendHandlers.get(guildId));
     }
 
-    public AudioPlayerSendHandler createAudioManager(String guildId) {
-        AudioManager audioManager = new AudioManager();
-        this.guildSendHandlers.put(guildId, audioManager);
-        return audioManager.getAudioPlayerSendHandler();
+    public BotAudioManager createAudioManager(String guildId) {
+        BotAudioManager botAudioManager = new BotAudioManager();
+        this.guildSendHandlers.put(guildId, botAudioManager);
+        return botAudioManager;
     }
 }

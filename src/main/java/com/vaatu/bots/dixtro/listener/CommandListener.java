@@ -6,13 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
-@Component
 public class CommandListener extends ListenerAdapter {
     private final HashMap<String, IExecuteCommand> commands = new HashMap<>();
 

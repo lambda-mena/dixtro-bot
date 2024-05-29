@@ -8,8 +8,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ScheduledEventsService {
 
+    private int timeOnline = 0;
+
     @Scheduled(fixedRate = 1000 * 60)
     public void updateClientActivity() {
-        log.info("Keeping bot alive...");
+        timeOnline = timeOnline + 1;
+        log.info("{} minutes alive", this.timeOnline);
     }
 }

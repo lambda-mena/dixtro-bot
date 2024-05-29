@@ -5,27 +5,29 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import lombok.Getter;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Getter
-public class AudioManager {
+public class BotAudioManager {
     private final BlockingQueue<AudioTrack> queue;
     private final AudioPlayerManager audioPlayerManager;
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
     private final AudioPlayerSendHandler audioPlayerSendHandler;
 
-    public AudioManager() {
+    public BotAudioManager() {
+        this.queue = new LinkedBlockingQueue<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
+        this.audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager(true));
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         this.audioPlayer = this.audioPlayerManager.createPlayer();
-        this.trackScheduler = new TrackScheduler();
+        this.trackScheduler = new TrackScheduler(queue);
         this.audioPlayer.addListener(this.trackScheduler);
         this.audioPlayerSendHandler = new AudioPlayerSendHandler(this.audioPlayer);
-        this.queue = new LinkedBlockingQueue<>();
     }
 
     public void loadTrack(String source) {

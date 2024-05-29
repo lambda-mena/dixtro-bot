@@ -6,9 +6,11 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.BlockingQueue;
 
+@Slf4j
 @RequiredArgsConstructor
 public class LoadResultHandler implements AudioLoadResultHandler {
     private final AudioPlayer audioPlayer;
@@ -16,8 +18,9 @@ public class LoadResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
+        log.info("Song: {} Loaded", audioTrack.getInfo().title);
         if (!audioPlayer.startTrack(audioTrack, true)) {
-            queue.offer(audioTrack);
+            queue.add(audioTrack);
         }
     }
 
@@ -28,11 +31,11 @@ public class LoadResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-
+        log.error("Unable to find this match.");
     }
 
     @Override
     public void loadFailed(FriendlyException e) {
-
+        log.error("Unable to load this track.");
     }
 }
