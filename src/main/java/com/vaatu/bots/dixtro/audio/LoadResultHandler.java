@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 @Slf4j
@@ -26,7 +27,14 @@ public class LoadResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
-
+        List<AudioTrack> tracks = audioPlaylist.getTracks();
+        AudioTrack starterTrack = tracks.removeFirst();
+        if (!audioPlayer.startTrack(starterTrack, true)) {
+            tracks.add(starterTrack);
+            queue.addAll(tracks);
+        } else {
+            queue.addAll(tracks);
+        }
     }
 
     @Override
@@ -36,6 +44,6 @@ public class LoadResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void loadFailed(FriendlyException e) {
-        log.error("Unable to load this track.");
+        log.error("Error at loading track: {}", e.getMessage());
     }
 }

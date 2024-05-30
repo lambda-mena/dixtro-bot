@@ -1,9 +1,9 @@
 package com.vaatu.bots.dixtro.command;
 
-import com.vaatu.bots.dixtro.audio.BotAudioManager;
+import com.vaatu.bots.dixtro.audio.GuildTrackManager;
 import com.vaatu.bots.dixtro.exception.UserException;
 import com.vaatu.bots.dixtro.exception.UserNotInVoiceException;
-import com.vaatu.bots.dixtro.service.ManagerService;
+import com.vaatu.bots.dixtro.service.TrackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,14 +23,14 @@ import java.util.Optional;
 @Component
 public class PlayCommand implements IExecuteCommand {
     // TODO: Make users able to input song names instead of urls or ids.
-    private final ManagerService managerService;
+    private final TrackService trackService;
 
     private String getSource(SlashCommandInteraction interaction) {
         OptionMapping optionMapping = interaction.getOption("source");
         return Objects.requireNonNull(optionMapping).getAsString();
     }
 
-    private void playTrack(BotAudioManager audioManager, SlashCommandInteraction interaction) {
+    private void playTrack(GuildTrackManager audioManager, SlashCommandInteraction interaction) {
         String source = getSource(interaction);
         audioManager.loadTrack(source);
     }
@@ -42,11 +42,11 @@ public class PlayCommand implements IExecuteCommand {
             AudioChannelUnion channel = Objects.requireNonNull(voiceState).getChannel();
 
             AudioManager guildAudioManager = Objects.requireNonNull(guild).getAudioManager();
-            BotAudioManager botAudioManager = managerService.createAudioManager(guild.getId());
-            guildAudioManager.setSendingHandler(botAudioManager.getAudioPlayerSendHandler());
+            GuildTrackManager guildTrackManager = trackService.createAudioManager(guild);
+            guildAudioManager.setSendingHandler(guildTrackManager.getAudioPlayerSendHandler());
             guildAudioManager.openAudioConnection(channel);
 
-            playTrack(botAudioManager, interaction);
+            playTrack(guildTrackManager, interaction);
             interaction.getHook().editOriginal("✅ Joined & Playing").queue();
         } catch (NullPointerException ex) {
             throw new UserNotInVoiceException();
@@ -55,14 +55,14 @@ public class PlayCommand implements IExecuteCommand {
 
     @Override
     public void execute(SlashCommandInteraction interaction) throws UserException {
-        interaction.deferReply(true).addContent("Loading...").queue();
+        interaction.deferReply(false).addContent("Loading...").queue();
 
         try {
             String guildId = Objects.requireNonNull(interaction.getGuild()).getId();
-            Optional<BotAudioManager> optAudioManager = this.managerService.getAudioManager(guildId);
-            BotAudioManager botAudioManager = optAudioManager.orElseThrow();
+            Optional<GuildTrackManager> optAudioManager = this.trackService.getAudioManager(guildId);
+            GuildTrackManager guildTrackManager = optAudioManager.orElseThrow();
 
-            playTrack(botAudioManager, interaction);
+            playTrack(guildTrackManager, interaction);
             interaction.getHook().editOriginal("✅ Added to queue").queue();
         } catch (NoSuchElementException ex) {
             this.joinChannelAndPlay(interaction);

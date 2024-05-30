@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 public class DixtroApplication {
-	// TODO: Add Skip, Clear, Queue commands.
+	// TODO: Add Clear, Queue commands.
 
 	public static void main(String[] args) {
 		SpringApplication.run(DixtroApplication.class, args);
