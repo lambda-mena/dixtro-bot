@@ -14,8 +14,8 @@ import java.util.concurrent.BlockingQueue;
 @Slf4j
 @RequiredArgsConstructor
 public class LoadResultHandler implements AudioLoadResultHandler {
-    private final AudioPlayer audioPlayer;
     private final BlockingQueue<AudioTrack> queue;
+    private final AudioPlayer audioPlayer;
 
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
@@ -39,7 +39,7 @@ public class LoadResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        log.error("Unable to find this match.");
+        log.error("Error at finding track.");
     }
 
     @Override

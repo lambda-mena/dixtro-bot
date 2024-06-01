@@ -42,7 +42,7 @@ public class PlayCommand implements IExecuteCommand {
             AudioChannelUnion channel = Objects.requireNonNull(voiceState).getChannel();
 
             AudioManager guildAudioManager = Objects.requireNonNull(guild).getAudioManager();
-            GuildTrackManager guildTrackManager = trackService.createAudioManager(guild);
+            GuildTrackManager guildTrackManager = trackService.createAudioManager(guild, interaction.getChannel());
             guildAudioManager.setSendingHandler(guildTrackManager.getAudioPlayerSendHandler());
             guildAudioManager.openAudioConnection(channel);
 
@@ -55,7 +55,7 @@ public class PlayCommand implements IExecuteCommand {
 
     @Override
     public void execute(SlashCommandInteraction interaction) throws UserException {
-        interaction.deferReply(false).addContent("Loading...").queue();
+        interaction.deferReply(true).addContent("Loading...").queue();
 
         try {
             String guildId = Objects.requireNonNull(interaction.getGuild()).getId();

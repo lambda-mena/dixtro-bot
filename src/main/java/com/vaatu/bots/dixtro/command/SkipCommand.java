@@ -19,7 +19,7 @@ public class SkipCommand implements IExecuteCommand {
 
     @Override
     public void execute(SlashCommandInteraction interaction) throws UserException {
-        interaction.deferReply().queue();
+        interaction.deferReply(true).queue();
         Guild guild = Objects.requireNonNull(interaction.getGuild());
 
         Optional<GuildTrackManager> optGuildTrackManager = this.trackService.getAudioManager(guild.getId());
