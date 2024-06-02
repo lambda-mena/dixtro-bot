@@ -5,20 +5,23 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.vaatu.bots.dixtro.message.IBotMessage;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.managers.AudioManager;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
 
+@Slf4j
 @Getter
 public class GuildTrackManager {
-    private final Consumer<String> disconnectConsumer = str -> this.disconnectVoiceManager();
-    private final Consumer<String> announceConsumer = this::announceTrackInChannel;
     private final AudioPlayerSendHandler audioPlayerSendHandler;
     private final AudioPlayerManager audioPlayerManager;
     private final LoadResultHandler loadResultHandler;
@@ -37,33 +40,59 @@ public class GuildTrackManager {
         this.audioPlayerManager.registerSourceManager(audioSourceManager);
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         this.audioPlayer = this.audioPlayerManager.createPlayer();
-        this.trackScheduler = new TrackScheduler(queue, disconnectConsumer, announceConsumer);
+        this.trackScheduler = new TrackScheduler(this);
         this.audioPlayer.addListener(this.trackScheduler);
         this.audioPlayerSendHandler = new AudioPlayerSendHandler(this.audioPlayer);
-        this.loadResultHandler = new LoadResultHandler(queue, audioPlayer);
+        this.loadResultHandler = new LoadResultHandler(this);
     }
 
-    public void announceTrackInChannel(String trackTitle) {
-        this.channelUnion.sendMessage("🎵 Playing: `" + trackTitle + "`").queue();
+    private boolean isSourceURL(String source) {
+        try {
+            new URI(source);
+            return true;
+        } catch (URISyntaxException ex) {
+            return false;
+        }
+    }
+
+    public boolean trackIsEmpty() {
+        return audioPlayer.getPlayingTrack() == null & this.queue.isEmpty();
+    }
+
+    public void announceInChannel(IBotMessage message, String trackTitle) {
+        this.channelUnion.sendMessage(message.getMessage() + " " + trackTitle).queue();
+    }
+
+    public void announceInChannel(MessageEmbed embed) {
+        this.channelUnion.sendMessageEmbeds(embed).queue();
     }
 
     public void disconnectVoiceManager() {
         AudioManager audioManager = this.guild.getAudioManager();
-        if (audioManager.isConnected() && audioPlayer.getPlayingTrack() == null) {
+        if (audioManager.isConnected() && trackIsEmpty()) {
             audioManager.closeAudioConnection();
+        } else {
+            log.error("Unable to disconnect from a not connected channel.");
         }
     }
 
     public void skipTrack() {
         AudioTrack nextTrack = queue.poll();
         if (nextTrack != null) {
+            log.info("Skipped song.");
             this.audioPlayer.startTrack(nextTrack, false);
         } else {
+            log.info("Disconnecting from skip command...");
             this.audioPlayer.stopTrack();
         }
     }
 
     public void loadTrack(String source) {
-        this.audioPlayerManager.loadItem(source, this.loadResultHandler);
+        boolean isURL = this.isSourceURL(source);
+        if (isURL) {
+            this.audioPlayerManager.loadItem(source, this.loadResultHandler);
+        } else {
+            this.audioPlayerManager.loadItem("ytsearch:" + source, this.loadResultHandler);
+        }
     }
 }

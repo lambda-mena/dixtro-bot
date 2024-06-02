@@ -5,38 +5,40 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import com.vaatu.bots.dixtro.embed.MusicEmbedFactory;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
-import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class TrackScheduler extends AudioEventAdapter {
-    private final BlockingQueue<AudioTrack> queue;
-    private final Consumer<String> closeConnection;
-    private final Consumer<String> announceTrack;
+    private final GuildTrackManager trackManager;
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        this.announceTrack.accept(track.getInfo().title);
+        MessageEmbed embed = MusicEmbedFactory.createSongEmbed(track.getInfo());
+        trackManager.announceInChannel(embed);
     }
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        Optional<AudioTrack> nextTrack = Optional.ofNullable(queue.poll());
+        Optional<AudioTrack> nextTrack = Optional.ofNullable(trackManager.getQueue().poll());
         if (nextTrack.isPresent() && (endReason.mayStartNext)) {
             player.startTrack(nextTrack.get(), false);
-        } else {
-            closeConnection.accept("");
+        } else if (nextTrack.isEmpty() & trackManager.trackIsEmpty()) {
+            MessageEmbed embed = MusicEmbedFactory.createFinishedTracks();
+            trackManager.announceInChannel(embed);
+            trackManager.disconnectVoiceManager();
         }
     }
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-        boolean lastSong = this.queue.isEmpty();
+        boolean lastSong = trackManager.getQueue().isEmpty();
         if (exception.severity.equals(FriendlyException.Severity.SUSPICIOUS) && lastSong) {
-            closeConnection.accept("");
+            trackManager.disconnectVoiceManager();
         }
     }
 }

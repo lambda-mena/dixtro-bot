@@ -1,27 +1,29 @@
 package com.vaatu.bots.dixtro.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.vaatu.bots.dixtro.embed.MusicEmbedFactory;
+import com.vaatu.bots.dixtro.message.FailedToLoadMessage;
+import com.vaatu.bots.dixtro.message.NotFoundMessage;
+import com.vaatu.bots.dixtro.message.PlaylistLoadMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 @Slf4j
 @RequiredArgsConstructor
 public class LoadResultHandler implements AudioLoadResultHandler {
-    private final BlockingQueue<AudioTrack> queue;
-    private final AudioPlayer audioPlayer;
+    private final GuildTrackManager trackManager;
 
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
         log.info("Song: {} Loaded", audioTrack.getInfo().title);
-        if (!audioPlayer.startTrack(audioTrack, true)) {
-            queue.add(audioTrack);
+        if (!trackManager.getAudioPlayer().startTrack(audioTrack, true)) {
+            trackManager.getQueue().add(audioTrack);
         }
     }
 
@@ -29,21 +31,31 @@ public class LoadResultHandler implements AudioLoadResultHandler {
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
         List<AudioTrack> tracks = audioPlaylist.getTracks();
         AudioTrack starterTrack = tracks.removeFirst();
-        if (!audioPlayer.startTrack(starterTrack, true)) {
-            tracks.add(starterTrack);
-            queue.addAll(tracks);
+
+        if (audioPlaylist.isSearchResult()) {
+            trackLoaded(starterTrack);
         } else {
-            queue.addAll(tracks);
+            trackManager.announceInChannel(new PlaylistLoadMessage(), tracks.size() + " Songs 😎");
+            if (!trackManager.getAudioPlayer().startTrack(starterTrack, true)) {
+                tracks.add(starterTrack);
+                trackManager.getQueue().addAll(tracks);
+            } else {
+                trackManager.getQueue().addAll(tracks);
+            }
         }
     }
 
     @Override
     public void noMatches() {
         log.error("Error at finding track.");
+        MessageEmbed errorEmbed = MusicEmbedFactory.createErrorEmbed(new NotFoundMessage().getMessage());
+        trackManager.announceInChannel(errorEmbed);
     }
 
     @Override
     public void loadFailed(FriendlyException e) {
         log.error("Error at loading track: {}", e.getMessage());
+        MessageEmbed errorEmbed = MusicEmbedFactory.createErrorEmbed(new FailedToLoadMessage().getMessage());
+        trackManager.announceInChannel(errorEmbed);
     }
 }

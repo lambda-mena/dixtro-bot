@@ -13,7 +13,7 @@ import java.util.List;
 
 @Slf4j
 public class CommandListener extends ListenerAdapter {
-    // TODO: test to check on possible uncaught exceptions
+
     private final HashMap<String, IExecuteCommand> commands = new HashMap<>();
 
     public CommandListener(List<IExecuteCommand> commands) {
@@ -34,9 +34,10 @@ public class CommandListener extends ListenerAdapter {
             foundCommand.execute(event);
         } catch (UserException ex) {
             log.error("{} User gave a bad input.", event.getUser().getName());
-            guildChannel.sendMessage("❌" + ex.getMessage()).queue();
+            guildChannel.sendMessage(ex.getMessage()).queue();
         } catch (Exception ex) {
             log.error(ex.getMessage());
+            ex.printStackTrace();
             guildChannel.sendMessage("❌ Internal Error").queue();
         }
     }
