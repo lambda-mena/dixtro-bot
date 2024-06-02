@@ -1,7 +1,7 @@
 package com.vaatu.bots.dixtro.listener;
 
 import com.vaatu.bots.dixtro.command.ISlashCommand;
-import com.vaatu.bots.dixtro.embed.MusicEmbedFactory;
+import com.vaatu.bots.dixtro.embed.EmbedFactory;
 import com.vaatu.bots.dixtro.exception.UserException;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -35,11 +35,11 @@ public class CommandListener extends ListenerAdapter {
             foundCommand.execute(event);
         } catch (UserException ex) {
             log.error("{} User gave a bad input.", event.getUser().getName());
-            MessageEmbed userErrorEmbed = MusicEmbedFactory.createUserErrorEmbed(ex.getMessage());
+            MessageEmbed userErrorEmbed = EmbedFactory.createUserErrorEmbed(ex.getMessage());
             event.getHook().sendMessageEmbeds(userErrorEmbed).queue();
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            MessageEmbed errorEmbed = MusicEmbedFactory.createInternalErrorEmbed();
+            MessageEmbed errorEmbed = EmbedFactory.createInternalErrorEmbed();
             event.getHook().sendMessageEmbeds(errorEmbed).queue();
         }
     }

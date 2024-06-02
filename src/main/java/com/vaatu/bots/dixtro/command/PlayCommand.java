@@ -26,7 +26,7 @@ public class PlayCommand implements ISlashCommand, IOptionsCommand {
     private final TrackService trackService;
 
     public String getDescription() {
-        return "Says pong!";
+        return "Plays a track in a voice channel.";
     }
 
     public List<OptionData> getOptions() {
@@ -76,8 +76,7 @@ public class PlayCommand implements ISlashCommand, IOptionsCommand {
     public void execute(SlashCommandInteraction interaction) throws UserException {
         try {
             String guildId = Objects.requireNonNull(interaction.getGuild()).getId();
-            Optional<GuildTrackManager> optAudioManager = this.trackService.getAudioManager(guildId);
-            GuildTrackManager guildTrackManager = optAudioManager.orElseThrow();
+            GuildTrackManager guildTrackManager = trackService.getAudioManager(guildId);
 
             Guild guild = interaction.getGuild();
             AudioChannelUnion channelUnion = getUserVoiceChannel(interaction);

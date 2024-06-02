@@ -5,7 +5,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import com.vaatu.bots.dixtro.embed.MusicEmbedFactory;
+import com.vaatu.bots.dixtro.embed.EmbedFactory;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -17,7 +17,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        MessageEmbed embed = MusicEmbedFactory.createSongEmbed(track.getInfo());
+        MessageEmbed embed = EmbedFactory.createSongEmbed(track.getInfo());
         trackManager.announceInChannel(embed);
     }
 
@@ -27,7 +27,7 @@ public class TrackScheduler extends AudioEventAdapter {
         if (nextTrack.isPresent() && (endReason.mayStartNext)) {
             player.startTrack(nextTrack.get(), false);
         } else if (nextTrack.isEmpty() & trackManager.trackIsEmpty()) {
-            MessageEmbed embed = MusicEmbedFactory.createFinishedTracks();
+            MessageEmbed embed = EmbedFactory.createDefault("🥳 Finished tracks");
             trackManager.announceInChannel(embed);
             trackManager.disconnectVoiceManager();
         }

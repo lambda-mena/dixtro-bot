@@ -5,7 +5,6 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.vaatu.bots.dixtro.message.IBotMessage;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -62,8 +61,8 @@ public class GuildTrackManager {
         return audioPlayer.getPlayingTrack() == null & this.queue.isEmpty();
     }
 
-    public void announceInChannel(IBotMessage message, String trackTitle) {
-        this.channelUnion.sendMessage(message.getMessage() + " " + trackTitle).queue();
+    public void announceInChannel(String message) {
+        this.channelUnion.sendMessage(message).queue();
     }
 
     public void announceInChannel(MessageEmbed embed) {
