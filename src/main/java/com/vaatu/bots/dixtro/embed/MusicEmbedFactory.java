@@ -17,10 +17,9 @@ public class MusicEmbedFactory {
     public static MessageEmbed createSongEmbed(AudioTrackInfo trackInfo) {
         EmbedBuilder newEmbed = new EmbedBuilder();
         newEmbed.setTitle("🎵 " + trackInfo.title);
-        newEmbed.setImage(trackInfo.artworkUrl);
-        newEmbed.addField("🖋️ Author:", trackInfo.author, false);
+        newEmbed.setAuthor("🖋️ Author:" + trackInfo.author);
         newEmbed.addField("💿 Video Length:", getVideoLength(trackInfo.length), false);
-        newEmbed.setAuthor(trackInfo.author);
+        newEmbed.setImage(trackInfo.artworkUrl);
         newEmbed.setColor(Color.ORANGE);
         return newEmbed.build();
     }
@@ -32,10 +31,18 @@ public class MusicEmbedFactory {
         return newEmbed.build();
     }
 
-    public static MessageEmbed createErrorEmbed(String errorReason) {
+    public static MessageEmbed createUserErrorEmbed(String errorReason) {
         EmbedBuilder newEmbed = new EmbedBuilder();
         newEmbed.setTitle("User Input Error");
         newEmbed.addField("Reason:", errorReason, true);
+        newEmbed.setColor(Color.RED);
+        return newEmbed.build();
+    }
+
+    public static MessageEmbed createInternalErrorEmbed() {
+        EmbedBuilder newEmbed = new EmbedBuilder();
+        newEmbed.setTitle("Internal Error.");
+        newEmbed.addField("Suggestion", "report this whenever you can.", true);
         newEmbed.setColor(Color.RED);
         return newEmbed.build();
     }

@@ -3,6 +3,7 @@ package com.vaatu.bots.dixtro.service;
 import com.vaatu.bots.dixtro.audio.GuildTrackManager;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +23,8 @@ public class TrackService {
         this.guildSendHandlers.remove(guildId);
     }
 
-    public GuildTrackManager createAudioManager(Guild guild, MessageChannelUnion channelUnion) {
-        GuildTrackManager guildTrackManager = new GuildTrackManager(guild, channelUnion);
+    public GuildTrackManager createAudioManager(Guild guild, MessageChannelUnion channelUnion, AudioChannelUnion voiceChannel) {
+        GuildTrackManager guildTrackManager = new GuildTrackManager(guild, channelUnion, voiceChannel);
         this.guildSendHandlers.put(guild.getId(), guildTrackManager);
         return guildTrackManager;
     }

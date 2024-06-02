@@ -6,10 +6,14 @@ import org.springframework.stereotype.Component;
 import java.text.MessageFormat;
 
 @Component
-public class PingCommand implements IExecuteCommand {
+public class PingCommand implements ISlashCommand {
+    public String getDescription() {
+        return "Says pong!";
+    }
+
     @Override
     public void execute(SlashCommandInteraction interaction) {
         Long ping = interaction.getJDA().getRestPing().complete();
-        interaction.reply(MessageFormat.format("✅ {0} Pong!", ping)).setEphemeral(true).queue();
+        interaction.getHook().editOriginal(MessageFormat.format("✅ {0} Pong!", ping)).queue();
     }
 }

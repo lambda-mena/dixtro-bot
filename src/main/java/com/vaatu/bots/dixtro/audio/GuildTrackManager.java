@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.managers.AudioManager;
 
@@ -26,13 +27,15 @@ public class GuildTrackManager {
     private final AudioPlayerManager audioPlayerManager;
     private final LoadResultHandler loadResultHandler;
     private final BlockingQueue<AudioTrack> queue;
+    private final AudioChannelUnion voiceChannel;
     private final MessageChannelUnion channelUnion;
     private final TrackScheduler trackScheduler;
     private final AudioPlayer audioPlayer;
     private final Guild guild;
 
-    public GuildTrackManager(Guild guild, MessageChannelUnion messageChannelUnion) {
+    public GuildTrackManager(Guild guild, MessageChannelUnion messageChannelUnion, AudioChannelUnion voiceChannel) {
         this.channelUnion = messageChannelUnion;
+        this.voiceChannel = voiceChannel;
         this.guild = guild;
         this.queue = new LinkedBlockingQueue<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
@@ -65,6 +68,17 @@ public class GuildTrackManager {
 
     public void announceInChannel(MessageEmbed embed) {
         this.channelUnion.sendMessageEmbeds(embed).queue();
+    }
+
+    public boolean isVoiceConnected() {
+        AudioManager guildAudioManager = this.guild.getAudioManager();
+        return guildAudioManager.isConnected();
+    }
+
+    public void connectVoiceManager() {
+        AudioManager guildAudioManager = this.guild.getAudioManager();
+        guildAudioManager.openAudioConnection(this.voiceChannel);
+        guildAudioManager.setSendingHandler(this.audioPlayerSendHandler);
     }
 
     public void disconnectVoiceManager() {

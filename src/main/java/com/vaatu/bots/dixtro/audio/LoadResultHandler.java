@@ -19,8 +19,15 @@ import java.util.List;
 public class LoadResultHandler implements AudioLoadResultHandler {
     private final GuildTrackManager trackManager;
 
+    private void connectToVoice() {
+        if (!this.trackManager.isVoiceConnected()) {
+            this.trackManager.connectVoiceManager();
+        }
+    }
+
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
+        connectToVoice();
         log.info("Song: {} Loaded", audioTrack.getInfo().title);
         if (!trackManager.getAudioPlayer().startTrack(audioTrack, true)) {
             trackManager.getQueue().add(audioTrack);
@@ -29,6 +36,7 @@ public class LoadResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
+        connectToVoice();
         List<AudioTrack> tracks = audioPlaylist.getTracks();
         AudioTrack starterTrack = tracks.removeFirst();
 
@@ -48,14 +56,14 @@ public class LoadResultHandler implements AudioLoadResultHandler {
     @Override
     public void noMatches() {
         log.error("Error at finding track.");
-        MessageEmbed errorEmbed = MusicEmbedFactory.createErrorEmbed(new NotFoundMessage().getMessage());
+        MessageEmbed errorEmbed = MusicEmbedFactory.createUserErrorEmbed(new NotFoundMessage().getMessage());
         trackManager.announceInChannel(errorEmbed);
     }
 
     @Override
     public void loadFailed(FriendlyException e) {
         log.error("Error at loading track: {}", e.getMessage());
-        MessageEmbed errorEmbed = MusicEmbedFactory.createErrorEmbed(new FailedToLoadMessage().getMessage());
+        MessageEmbed errorEmbed = MusicEmbedFactory.createUserErrorEmbed(new FailedToLoadMessage().getMessage());
         trackManager.announceInChannel(errorEmbed);
     }
 }

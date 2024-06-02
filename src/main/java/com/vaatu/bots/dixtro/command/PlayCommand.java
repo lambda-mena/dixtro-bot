@@ -11,20 +11,29 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.springframework.stereotype.Component;
 
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Slf4j
 @Component
-public class PlayCommand implements IExecuteCommand {
-    // TODO: Fix bot connecting to a unmatched song.
+public class PlayCommand implements ISlashCommand, IOptionsCommand {
     private final TrackService trackService;
+
+    public String getDescription() {
+        return "Says pong!";
+    }
+
+    public List<OptionData> getOptions() {
+        List<OptionData> options = new ArrayList<>();
+        options.add(new OptionData(OptionType.STRING, "source", "URL or Keyword of track", true));
+        return options;
+    }
 
     private String getSource(SlashCommandInteraction interaction) {
         OptionMapping optionMapping = interaction.getOption("source");
@@ -36,23 +45,28 @@ public class PlayCommand implements IExecuteCommand {
         audioManager.loadTrack(source);
     }
 
-    private AudioChannelUnion getVoiceChannel(SlashCommandInteraction interaction) {
+    private AudioChannelUnion getBotVoiceChannel(Guild guild) throws NoSuchElementException {
+        AudioManager guildAudioManager = guild.getAudioManager();
+        Optional<AudioChannelUnion> optAudioChannel = Optional.ofNullable(guildAudioManager.getConnectedChannel());
+        return optAudioChannel.orElseThrow();
+    }
+
+    private AudioChannelUnion getUserVoiceChannel(SlashCommandInteraction interaction) {
         GuildVoiceState voiceState = Objects.requireNonNull(interaction.getMember()).getVoiceState();
         return Objects.requireNonNull(voiceState).getChannel();
     }
 
-    private void joinChannelAndPlay(SlashCommandInteraction interaction) throws UserException {
+    private void createTrackManager(SlashCommandInteraction interaction) throws UserException {
         try {
             Guild guild = interaction.getGuild();
-            AudioChannelUnion channel = getVoiceChannel(interaction);
+            AudioChannelUnion channel = getUserVoiceChannel(interaction);
             AudioManager guildAudioManager = Objects.requireNonNull(guild).getAudioManager();
-            guildAudioManager.openAudioConnection(channel);
 
-            GuildTrackManager guildTrackManager = trackService.createAudioManager(guild, interaction.getChannel());
+            GuildTrackManager guildTrackManager = trackService.createAudioManager(guild, interaction.getChannel(), channel);
             guildAudioManager.setSendingHandler(guildTrackManager.getAudioPlayerSendHandler());
 
             playTrack(guildTrackManager, interaction);
-            interaction.getHook().editOriginal("✅ Joined").queue();
+            interaction.getHook().editOriginal("✅ Searching track...").queue();
         } catch (NullPointerException | IllegalArgumentException ex) {
             throw new UserNotInVoiceException();
         }
@@ -60,24 +74,23 @@ public class PlayCommand implements IExecuteCommand {
 
     @Override
     public void execute(SlashCommandInteraction interaction) throws UserException {
-        interaction.deferReply(true).addContent("Loading...").queue();
-
         try {
             String guildId = Objects.requireNonNull(interaction.getGuild()).getId();
             Optional<GuildTrackManager> optAudioManager = this.trackService.getAudioManager(guildId);
             GuildTrackManager guildTrackManager = optAudioManager.orElseThrow();
 
             Guild guild = interaction.getGuild();
-            AudioChannelUnion channelUnion = getVoiceChannel(interaction);
+            AudioChannelUnion channelUnion = getUserVoiceChannel(interaction);
+            AudioChannelUnion botChannel = getBotVoiceChannel(guild);
 
-            if (channelUnion.equals(guild.getAudioManager().getConnectedChannel())) {
+            if (channelUnion.equals(botChannel)) {
                 playTrack(guildTrackManager, interaction);
                 interaction.getHook().editOriginal("✅ Added to queue").queue();
             } else {
                 throw new BotInOtherVoiceException();
             }
         } catch (NoSuchElementException ex) {
-            this.joinChannelAndPlay(interaction);
+            this.createTrackManager(interaction);
         }
     }
 }

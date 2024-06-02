@@ -1,9 +1,10 @@
 package com.vaatu.bots.dixtro.listener;
 
-import com.vaatu.bots.dixtro.command.IExecuteCommand;
+import com.vaatu.bots.dixtro.command.ISlashCommand;
+import com.vaatu.bots.dixtro.embed.MusicEmbedFactory;
 import com.vaatu.bots.dixtro.exception.UserException;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -13,11 +14,11 @@ import java.util.List;
 
 @Slf4j
 public class CommandListener extends ListenerAdapter {
+    // TODO: Remake error messages to embeds.
+    private final HashMap<String, ISlashCommand> commands = new HashMap<>();
 
-    private final HashMap<String, IExecuteCommand> commands = new HashMap<>();
-
-    public CommandListener(List<IExecuteCommand> commands) {
-        for (IExecuteCommand command : commands) {
+    public CommandListener(List<ISlashCommand> commands) {
+        for (ISlashCommand command : commands) {
             String className = command.getClass().getSimpleName();
             String commandName = className.split("Command")[0];
             this.commands.put(commandName.toLowerCase(), command);
@@ -26,18 +27,20 @@ public class CommandListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        MessageChannelUnion guildChannel = event.getChannel();
+        event.deferReply(true).queue();
         String commandName = event.getName();
-        IExecuteCommand foundCommand = this.commands.get(commandName);
+        ISlashCommand foundCommand = this.commands.get(commandName);
 
         try {
             foundCommand.execute(event);
         } catch (UserException ex) {
             log.error("{} User gave a bad input.", event.getUser().getName());
-            guildChannel.sendMessage(ex.getMessage()).queue();
+            MessageEmbed userErrorEmbed = MusicEmbedFactory.createUserErrorEmbed(ex.getMessage());
+            event.getHook().sendMessageEmbeds(userErrorEmbed).queue();
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            guildChannel.sendMessage("❌ Internal Error").queue();
+            MessageEmbed errorEmbed = MusicEmbedFactory.createInternalErrorEmbed();
+            event.getHook().sendMessageEmbeds(errorEmbed).queue();
         }
     }
 }

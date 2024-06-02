@@ -7,6 +7,7 @@ import com.vaatu.bots.dixtro.service.TrackService;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+import net.dv8tion.jda.api.managers.AudioManager;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -14,16 +15,20 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
-public class SkipCommand implements IExecuteCommand {
+public class SkipCommand implements ISlashCommand {
     private final TrackService trackService;
+
+    public String getDescription() {
+        return "Skips the current track";
+    }
 
     @Override
     public void execute(SlashCommandInteraction interaction) throws UserException {
-        interaction.reply("Loading command...").setEphemeral(false).queue();
         Guild guild = Objects.requireNonNull(interaction.getGuild());
+        AudioManager audioManager = guild.getAudioManager();
 
         Optional<GuildTrackManager> optGuildTrackManager = this.trackService.getAudioManager(guild.getId());
-        if (optGuildTrackManager.isPresent()) {
+        if (optGuildTrackManager.isPresent() && audioManager.isConnected()) {
             GuildTrackManager guildTrackManager = optGuildTrackManager.get();
             guildTrackManager.skipTrack();
             interaction.getHook().editOriginal("✅ Song skipped").queue();
