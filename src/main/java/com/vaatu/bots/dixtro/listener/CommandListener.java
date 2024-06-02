@@ -37,7 +37,6 @@ public class CommandListener extends ListenerAdapter {
             guildChannel.sendMessage(ex.getMessage()).queue();
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            ex.printStackTrace();
             guildChannel.sendMessage("❌ Internal Error").queue();
         }
     }

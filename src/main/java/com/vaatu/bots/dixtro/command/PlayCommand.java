@@ -1,7 +1,7 @@
 package com.vaatu.bots.dixtro.command;
 
 import com.vaatu.bots.dixtro.audio.GuildTrackManager;
-import com.vaatu.bots.dixtro.exception.BotNotInVoiceException;
+import com.vaatu.bots.dixtro.exception.BotInOtherVoiceException;
 import com.vaatu.bots.dixtro.exception.UserException;
 import com.vaatu.bots.dixtro.exception.UserNotInVoiceException;
 import com.vaatu.bots.dixtro.service.TrackService;
@@ -74,7 +74,7 @@ public class PlayCommand implements IExecuteCommand {
                 playTrack(guildTrackManager, interaction);
                 interaction.getHook().editOriginal("✅ Added to queue").queue();
             } else {
-                throw new BotNotInVoiceException();
+                throw new BotInOtherVoiceException();
             }
         } catch (NoSuchElementException ex) {
             this.joinChannelAndPlay(interaction);
