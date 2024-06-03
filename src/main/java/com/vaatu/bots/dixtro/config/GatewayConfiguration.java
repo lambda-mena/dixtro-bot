@@ -2,15 +2,12 @@ package com.vaatu.bots.dixtro.config;
 
 import com.vaatu.bots.dixtro.command.IOptionsCommand;
 import com.vaatu.bots.dixtro.command.ISlashCommand;
-import com.vaatu.bots.dixtro.listener.CommandListener;
-import com.vaatu.bots.dixtro.listener.ReadyListener;
-import com.vaatu.bots.dixtro.listener.VoiceUpdateListener;
-import com.vaatu.bots.dixtro.service.TrackService;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.managers.Presence;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -49,7 +46,7 @@ public class GatewayConfiguration {
     }
 
     @Bean
-    public JDA jda(List<ISlashCommand> commands, TrackService trackService) {
+    public JDA jda(List<ISlashCommand> commands, ListenerAdapter... adapters) {
         JDA bot = JDABuilder.createDefault(token)
                 .enableIntents(GatewayIntent.GUILD_VOICE_STATES)
                 .build();
@@ -59,9 +56,7 @@ public class GatewayConfiguration {
         Presence botPresence = bot.getPresence();
         botPresence.setPresence(OnlineStatus.IDLE, Activity.customStatus("Sealed away"));
 
-        bot.addEventListener(new ReadyListener());
-        bot.addEventListener(new VoiceUpdateListener(trackService));
-        bot.addEventListener(new CommandListener(commands));
+        bot.addEventListener((Object[]) adapters);
         return bot;
     }
 }

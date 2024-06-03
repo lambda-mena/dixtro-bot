@@ -4,6 +4,7 @@ import com.vaatu.bots.dixtro.audio.GuildTrackManager;
 import com.vaatu.bots.dixtro.exception.BotInOtherVoiceException;
 import com.vaatu.bots.dixtro.exception.UserException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class TrackService {
@@ -22,11 +24,15 @@ public class TrackService {
         AudioChannelUnion channelUnion = audioManager.getConnectedChannel();
         if (channelUnion != null) {
             List<Member> memberList = channelUnion.getMembers();
-            int index = memberList.indexOf(member);
-            return index >= 0;
+            return memberList.contains(member);
         } else {
             return false;
         }
+    }
+
+    public GuildTrackManager getAudioManager(String guildId) throws NoSuchElementException {
+        Optional<GuildTrackManager> opt = Optional.ofNullable(this.guildSendHandlers.get(guildId));
+        return opt.orElseThrow();
     }
 
     public GuildTrackManager getAudioManager(String guildId, Member member) throws NoSuchElementException, UserException {
@@ -34,15 +40,25 @@ public class TrackService {
         GuildTrackManager guildTrackManager = opt.orElseThrow();
         AudioManager audioManager = guildTrackManager.getGuild().getAudioManager();
 
-        if (audioManager.isConnected() && isMemberInTheVC(audioManager, member)) {
-            return guildTrackManager;
+        if (audioManager.isConnected()) {
+            if (isMemberInTheVC(audioManager, member)) {
+                return guildTrackManager;
+            } else {
+                throw new BotInOtherVoiceException();
+            }
         } else {
-            throw new BotInOtherVoiceException();
+            throw new NoSuchElementException();
         }
     }
 
     public void removeAudioManager(String guildId) {
-        this.guildSendHandlers.remove(guildId);
+        try {
+            GuildTrackManager trackManager = this.getAudioManager(guildId);
+            trackManager.destroyInstance();
+            this.guildSendHandlers.remove(guildId);
+        } catch (NoSuchElementException ex) {
+            log.error("TrackManager not found");
+        }
     }
 
     public GuildTrackManager createAudioManager(Guild guild, MessageChannelUnion channelUnion, AudioChannelUnion voiceChannel) {

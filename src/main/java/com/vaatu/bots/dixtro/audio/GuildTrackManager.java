@@ -80,6 +80,11 @@ public class GuildTrackManager {
         guildAudioManager.setSendingHandler(this.audioPlayerSendHandler);
     }
 
+    public void destroyInstance() {
+        this.audioPlayer.destroy();
+        this.queue.clear();
+    }
+
     public void disconnectVoiceManager() {
         AudioManager audioManager = this.guild.getAudioManager();
         if (audioManager.isConnected() && trackIsEmpty()) {

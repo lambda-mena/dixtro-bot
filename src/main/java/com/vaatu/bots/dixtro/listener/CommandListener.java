@@ -8,13 +8,14 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
+@Component
 public class CommandListener extends ListenerAdapter {
-    // TODO: Remake error messages to embeds.
     private final HashMap<String, ISlashCommand> commands = new HashMap<>();
 
     public CommandListener(List<ISlashCommand> commands) {
