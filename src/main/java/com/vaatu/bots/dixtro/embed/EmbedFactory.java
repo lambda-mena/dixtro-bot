@@ -26,9 +26,9 @@ public class EmbedFactory {
 
     public static MessageEmbed createSongEmbed(AudioTrackInfo trackInfo) {
         EmbedBuilder newEmbed = new EmbedBuilder();
-        newEmbed.setTitle("🎵 " + trackInfo.title);
+        newEmbed.setTitle("💿 " + trackInfo.title);
         newEmbed.setAuthor("🖋️ Author: " + trackInfo.author);
-        newEmbed.addField("💿 Video Length:", getVideoLength(trackInfo.length), false);
+        newEmbed.addField("🎵 Video Length:", getVideoLength(trackInfo.length), false);
         newEmbed.setImage(trackInfo.artworkUrl);
         newEmbed.setColor(Color.ORANGE);
         return newEmbed.build();
