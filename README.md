@@ -10,10 +10,12 @@ in a selected discord voice channel.
 - Allow user to add tracks to the channel queue.
 - Users can check the current channel track queue.
 - Allow the user to skip the current song.
+- Tracks can be paused everytime the users want.
 - Users can clear the channel queue to add other songs.
 
 ### Commands
 - play
+- pause
 - queue
 - skip
 - clear

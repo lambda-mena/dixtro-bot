@@ -34,6 +34,18 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     @Override
+    public void onPlayerPause(AudioPlayer player) {
+        MessageEmbed embed = EmbedFactory.createDefault("▶️ Track paused.");
+        trackManager.announceInChannel(embed);
+    }
+
+    @Override
+    public void onPlayerResume(AudioPlayer player) {
+        MessageEmbed embed = EmbedFactory.createDefault("⏸️ Track resumed.");
+        trackManager.announceInChannel(embed);
+    }
+
+    @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
         boolean lastSong = trackManager.getQueue().isEmpty();
         if (exception.severity.equals(FriendlyException.Severity.SUSPICIOUS) && lastSong) {
