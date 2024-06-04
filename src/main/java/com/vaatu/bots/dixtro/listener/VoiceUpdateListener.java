@@ -18,7 +18,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Component
 public class VoiceUpdateListener extends ListenerAdapter {
-    // TODO: Ensure this class enforces the Open/Closed principle.
     private final VoiceEmptyEvent voiceEmptyEvent;
     private final VoiceLeftEvent voiceLeftEvent;
     private final TrackService trackService;
