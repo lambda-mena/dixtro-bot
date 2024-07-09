@@ -1,4 +1,4 @@
-# Dixtro Bot
+# Music Bot Template
 Open source java music bot, this bot purpose is 
 to deliver a simple and ready to use discord music bot built in java,
 it uses JDA library to work with Discord Gateway, and for the audio player
