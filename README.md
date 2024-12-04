@@ -1,4 +1,4 @@
-# Music Bot Template
+# Dixtro Music Bot
 Open source java music bot, this bot purpose is 
 to deliver a simple and ready to use discord music bot built in java,
 it uses JDA library to work with Discord Gateway, and for the audio player
@@ -23,6 +23,6 @@ in a selected discord voice channel.
 
 ### Support
 If you find any bug or problem with the bot usage, 
-be sure to send a direct message to me in discord @boreaswind 
+be sure to send a direct message to me in discord @lambda.vaatu
 As well if you find something to suggest 
 i'd be happy to hear anything you have thought of.

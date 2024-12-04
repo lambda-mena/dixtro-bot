@@ -1,6 +1,6 @@
 plugins {
 	java
-	id("org.springframework.boot") version "3.3.0"
+	id("org.springframework.boot") version "3.3.6"
 	id("io.spring.dependency-management") version "1.1.5"
 }
 
@@ -26,8 +26,8 @@ repositories {
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("net.dv8tion:JDA:5.0.0-beta.24")
-	implementation("dev.arbjerg:lavaplayer:2.1.2")
-	implementation("dev.lavalink.youtube:v2:1.3.0")
+	implementation("dev.arbjerg:lavaplayer:2.2.2")
+	implementation("dev.lavalink.youtube:v2:1.10.2")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.projectlombok:lombok")
