@@ -1,8 +1,5 @@
 FROM gradle:8.11.1-jdk21 AS build
 
-ARG TOKEN
-ENV TOKEN=${TOKEN}
-
 WORKDIR /app
 
 COPY build.gradle.kts settings.gradle.kts /app/
